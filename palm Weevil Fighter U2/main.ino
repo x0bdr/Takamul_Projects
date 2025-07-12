@@ -33,7 +33,7 @@ void loop() {
   Serial.print(distance);
   Serial.println(" cm");
 
-  // إذا الجسم على بعد أقل من أو يساوي 1 متر
+  // إذا الجسم على بعد أقل من أو يساوي ٢٠ سم
   if (distance > 0 && distance <= 20) {
     digitalWrite(LED_PIN, HIGH);  // تشغيل الليد
 
