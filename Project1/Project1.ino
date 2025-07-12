@@ -1,61 +1,46 @@
-#include <Servo.h>
+#define TRIG_PIN 10
+#define ECHO_PIN 9
+#define BUZZER_PIN 5
+#define LED_PIN 13
 
-Servo servo1;
-Servo servo2;
-Servo servo3;
-Servo servo4;
-
-const int buttonPin = 2;
-bool previousButtonState = HIGH;
-bool sweeping = false;
+long duration;
+float distance;
 
 void setup() {
-  servo1.attach(3);
-  servo2.attach(5);
-  servo3.attach(6);
-  servo4.attach(9);
-
-  servo1.write(0);
-  servo2.write(0);
-  servo3.write(0);
-  servo4.write(0);
-
-  pinMode(buttonPin, INPUT_PULLUP);
+  pinMode(TRIG_PIN, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
+  pinMode(BUZZER_PIN, OUTPUT);
+  pinMode(LED_PIN, OUTPUT);
+  Serial.begin(9600);
 }
 
 void loop() {
-  bool currentButtonState = digitalRead(buttonPin);
+  // إرسال نبضة
+  digitalWrite(TRIG_PIN, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG_PIN, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG_PIN, LOW);
 
-  if (currentButtonState == LOW && previousButtonState == HIGH) {
-    sweeping = !sweeping;
+  // قراءة النبضة الراجعة
+  duration = pulseIn(ECHO_PIN, HIGH);
 
-    if (sweeping) {
-      sweepServosForward();
-    } else {
-      sweepServosBackward();
-    }
+  // حساب المسافة بالسنتيمتر
+  distance = duration * 0.034 / 2;
+
+  // طباعة المسافة في Serial Monitor
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+
+  // إذا المسافة أقل من أو تساوي 10 سم ➝ شغّل البازر والليد
+  if (distance > 0 && distance <= 10) {
+    digitalWrite(BUZZER_PIN, HIGH);
+    digitalWrite(LED_PIN, HIGH);
+  } else {
+    digitalWrite(BUZZER_PIN, LOW);
+    digitalWrite(LED_PIN, LOW);
   }
 
-  previousButtonState = currentButtonState;
-  delay(50); // Debounce
-}
-
-void sweepServosForward() {
-  for (int pos = 0; pos <= 180; pos++) {
-    servo1.write(pos);
-    servo2.write(pos);
-    servo3.write(pos);
-    servo4.write(pos);
-    delay(30);
-  }
-}
-
-void sweepServosBackward() {
-  for (int pos = 180; pos >= 0; pos--) {
-    servo1.write(pos);
-    servo2.write(pos);
-    servo3.write(pos);
-    servo4.write(pos);
-    delay(30);
-  }
+  delay(200); // تحديث كل 0.2 ثانية
 }
