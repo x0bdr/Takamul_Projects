@@ -5,6 +5,12 @@ Servo servo2;
 Servo servo3;
 Servo servo4;
 
+servo1.write(0);
+servo2.write(0);
+servo3.write(0);
+servo4.write(0);
+
+
 const int buttonPin = 2;
 bool previousButtonState = HIGH;
 bool sweeping = false;
