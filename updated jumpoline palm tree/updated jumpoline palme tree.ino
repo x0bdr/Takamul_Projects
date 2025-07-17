@@ -9,7 +9,10 @@ const int buttonPin = 2;
 bool previousButtonState = HIGH;
 bool isRunning = false;
 bool directionForward = true; // اتجاه الدوران
-
+// const int buttonPin = 2;
+// bool previousButtonState = HIGH;
+// bool isRunning = false;
+// bool directionBackord = true;
 void setup() {
   servo1.attach(3);
   servo2.attach(5);
@@ -18,9 +21,9 @@ void setup() {
 
   pinMode(buttonPin, INPUT_PULLUP);
 
-  stopServos();
-
   Serial.begin(9600);
+
+  stopServos();
 }
 
 void loop() {
@@ -42,12 +45,13 @@ void loop() {
 void rotate360(bool forward) {
   isRunning = true;
 
-  int speed = forward ? 180 : 0; // 180 للدوران للأمام، 0 للخلف
+  int speed1 = forward ? 180 : 0; // 180 للدوران للأمام، 0 للخلف
+  int speed2 = forward ? 0 : 180; // 180 للدوران للأمام، 0 للخلف
 
-  servo1.write(speed);
-  servo2.write(speed);
-  servo3.write(speed);
-  servo4.write(speed);
+  servo1.write(speed2);
+  servo2.write(speed2);
+  servo3.write(speed1);
+  servo4.write(speed1);
 
   delay(1500); // زمن الدوران لدورة كاملة (ضبط حسب سرعة السيرفو)
 
