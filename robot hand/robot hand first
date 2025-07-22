@@ -1,0 +1,62 @@
+#include <Servo.h>
+
+const int joyX = A3;        // محور X للجويستيك (التحكم بالسيرفو الثاني)
+const int joyY = A2;        // محور Y للجويستيك (التحكم بالسيرفو الأول)
+const int buttonPin = 4;    // زر الجويستيك (SW)
+
+const int servoPinY = 5;    // السيرفو الأول (Y) على D5
+const int servoPinX = 6;    // السيرفو الثاني (X) على D6
+const int servoPinClaw = 7; // سيرفو الكلاب على D7
+
+Servo servoY;
+Servo servoX;
+Servo servoClaw;
+
+bool clawOpen = false;           // حالة الكلاب: مفتوح/مغلق
+bool previousButtonState = HIGH; // حالة الزر السابقة
+
+void setup() {
+  pinMode(buttonPin, INPUT_PULLUP);
+  servoY.attach(servoPinY);
+  servoX.attach(servoPinX);
+  servoClaw.attach(servoPinClaw);
+  servoClaw.write(90); // ابدأ بالكلاب مغلقة
+  Serial.begin(9600);
+}
+
+void loop() {
+  int xValue = analogRead(joyX);
+  int yValue = analogRead(joyY);
+  bool currentButtonState = digitalRead(buttonPin);
+
+  int angleY = map(yValue, 0, 1023, 0, 180);
+  int angleX = map(xValue, 0, 1023, 0, 180);
+
+  servoY.write(angleY);
+  servoX.write(angleX);
+
+  // فحص تغير حالة الزر (للكشف عن ضغط جديد)
+  if (currentButtonState == LOW && previousButtonState == HIGH) {
+    clawOpen = !clawOpen; // تبديل الحالة
+    if (clawOpen) {
+      servoClaw.write(0);   // فتح الكلاب
+    } else {
+      servoClaw.write(90);  // غلق الكلاب
+    }
+    delay(200); // تأخير ديبونس
+  }
+
+  previousButtonState = currentButtonState;
+
+  // طباعة للسيريال
+  Serial.print("X: ");
+  Serial.print(xValue);
+  Serial.print("  Y: ");
+  Serial.print(yValue);
+  Serial.print("  Button: ");
+  Serial.print(currentButtonState);
+  Serial.print("  Claw Open: ");
+  Serial.println(clawOpen);
+
+  delay(20);
+}
